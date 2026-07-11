@@ -18,7 +18,7 @@ To create a general overview of the application and the roles of each actor, a *
 
 ### 2.2 Dependencies/References
 
-The use cases shown in the **UCD** are based on the user stories listed in the [`user-stories.md`](documentation/global/user-stories.md) file.
+The use cases shown in the **UCD** are based on the user stories listed in the [`user-stories.md`](../global/user-stories.md) file.
 
 ---
 
