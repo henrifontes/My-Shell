@@ -1,0 +1,135 @@
+@startuml
+
+' left to right direction
+skinparam linetype polyline
+skinparam nodesep 50
+skinparam ranksep 5
+
+skinparam backgroundColor #1E1E2E
+skinparam defaultFontColor #FFFFFF
+skinparam titleFontColor #FFFFFF
+
+skinparam actorFontColor #FFFFFF
+skinparam actorBorderColor #AFA9EC
+
+skinparam usecaseArrowColor #FFFFFF
+
+skinparam usecaseBorderColor #AFA9EC
+skinparam usecaseBackgroundColor #534AB7
+
+skinparam packageBorderColor #FFFFFF
+skinparam packageFontColor #FFFFFF
+skinparam packageBackgroundColor transparent
+
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+title US003 - Use Case Diagram
+
+' ---------- Actors ----------
+actor "System User"        as SU
+actor "Kernel"             as OS
+actor "External Programs"  as EP
+actor "File System"        as FS
+
+' ---------- System boundary ----------
+package "Session Management" {
+    usecase "Start Shell"               as UC_Start
+    usecase "Load Configuration File"   as UC_Config
+    usecase "Customize Prompt"          as UC_Prompt
+    usecase "Exit Shell"                as UC_Exit
+}
+
+package "Tokenization & Prompt Management" {
+    usecase "Parse Input"               as UC_Parse
+    usecase "Tokenize Input"            as UC_Token
+    usecase "Expand Tokens"             as UC_Expand
+    usecase "Pipe Commands"             as UC_Pipe
+    usecase "Sequence Commands"         as UC_Seq
+}
+
+package "Command Execution" {
+    usecase "Execute Command"           as UC_Exec
+    usecase "Run Built-in Command"      as UC_Builtin
+    usecase "Run External Program"      as UC_External
+    usecase "Run in Background"         as UC_Bg
+}
+
+package "I/O Redirection" {
+    usecase "Redirect Input"            as UC_RIn
+    usecase "Redirect Output"           as UC_ROut
+    usecase "Redirect Error"            as UC_RErr
+}
+
+package "Job Control" {
+    usecase "List Jobs"                 as UC_Jobs
+    usecase "Bring Job to Foreground"   as UC_Fg
+    usecase "Send Signal to Job"        as UC_Sig
+}
+
+package "History & Editing" {
+    usecase "Recall History"            as UC_Hist
+    usecase "Tab-Complete"              as UC_Tab
+    usecase "Edit Line"                 as UC_Edit
+}
+
+package "Environment" {
+    usecase "Manage Environment Vars"   as UC_Env
+    usecase "Manage Aliases"            as UC_Alias
+}
+
+' ---------- System User associations ----------
+SU --> UC_Start
+SU --> UC_Exit
+SU --> UC_Prompt
+SU --> UC_Exec
+SU --> UC_Jobs
+SU --> UC_Fg
+SU --> UC_Sig
+SU --> UC_Hist
+SU --> UC_Tab
+SU --> UC_Edit
+SU --> UC_Env
+SU --> UC_Alias
+
+' ---------- Generalization connections (Child --|> Parent) ----------
+UC_Builtin  --|> UC_Exec
+UC_External --|> UC_Exec
+
+' ---------- Include connections (A ..> B : means A includes B) ----------
+UC_Exec  ..> UC_Parse   : <<include>>
+UC_Exec  ..> UC_Expand  : <<include>>
+UC_Start ..> UC_Config  : <<include>>
+UC_Parse ..> UC_Token   : <<include>>
+
+' ---------- Extend connections (extension ..> base) ----------
+UC_Pipe ..> UC_Exec : <<extend>>
+UC_Seq  ..> UC_Exec : <<extend>>
+UC_Bg   ..> UC_Exec : <<extend>>
+UC_RIn  ..> UC_Exec : <<extend>>
+UC_ROut ..> UC_Exec : <<extend>>
+UC_RErr ..> UC_Exec : <<extend>>
+
+' ---------- Secondary actor associations ----------
+UC_External -> EP
+UC_External -> OS
+UC_Builtin  -> OS
+UC_Sig      -> OS
+UC_Fg       -> OS
+
+UC_Config -> FS
+UC_Hist   -> FS
+UC_RIn    -> FS
+UC_ROut   -> FS
+UC_RErr   -> FS
+
+' ---------- Layout constraints ----------
+' Force better layout using hidden links
+"Session Management" -[hidden]down- "Tokenization & Prompt Management"
+"Tokenization & Prompt Management" -[hidden]down- "Command Execution"
+"Command Execution" -[hidden]down- "I/O Redirection"
+"I/O Redirection" -[hidden]down- "Job Control"
+"Job Control" -[hidden]down- "History & Editing"
+"History & Editing" -[hidden]down- "Environment"
+
+@enduml

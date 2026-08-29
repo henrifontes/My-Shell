@@ -24,5 +24,7 @@ The use cases shown in the **UCD** are based on the user stories listed in the [
 
 ## 3. Relevant Information/Considerations
 
-Some of the system components are represented as actors (`Kernel`, `File System`, and `External Programs`). It's important to state that those system components then are called _secondary actors_ in the system modeling, since they are not responsible for starting use cases. The only actor with this role is the `System User`, being so the _primary actor_ of the system. The secondary actors help the primary actor to conclude the use cases and finish its goals in the system.
-The component `File System` is a passive data store, which means it doesn't have any active role in the system. However, it's modeled as an actor because it is an entity external to the system boundary.
+Some of the system components are represented as actors (`Kernel`, `File System`, and `External Programs`). It's important to state that those system components then are called _secondary actors_ in the system modeling, since they are not responsible for starting use cases. The only actor with this role is the `System User`, being so the _primary actor_ of the system. The secondary actors help the primary actor to conclude the use cases and finish its goals.
+The component `File System` is a passive data store, which means it doesn't have any active role. However, it's modeled as an actor because it is an external entity to the system boundary.
+
+Since the designing of the UCD is being made before the actual implementation of the system, the diagram might eventually have to be updated in the future.
