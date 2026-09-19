@@ -1,0 +1,85 @@
+@startuml
+
+hide circles
+hide methods
+hide empty members
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #1E1E2E
+skinparam defaultFontColor #FFFFFF
+skinparam titleFontColor #FFFFFF
+
+skinparam class {
+    BackgroundColor #534AB7
+    BorderColor #AFA9EC
+    FontColor #FFFFFF
+}
+
+skinparam arrow {
+    Color #9F9FBF
+    FontColor #FFFFFF
+}
+
+title US004 - Domain Model
+
+'========================='
+'     Shell & Session     '
+'========================='
+class Terminal {}
+class Session {}
+class Shell {}
+class Prompt {}
+class Environment {}
+class Variable {}
+class Alias {}
+
+'============================'
+'     Parsing & Commands     '
+'============================'
+class Input {}
+class Token {}
+class Command {}
+class Pipeline {}
+class Redirection {}
+
+'==================='
+'     Execution     '
+'==================='
+class Job {}
+class Process {}
+class Program {}
+class Signal {}
+class Kernel {}
+class Syscall {}
+
+'=== RELATIONS ===
+
+' Settings & ‘User’ Session
+Terminal "1" *- "1" Session : hosts
+Session "1" *-- "1" Shell : runs
+Shell "1" *-- "1" Prompt : displays
+Shell "1" *-- "1" Environment : maintains
+Environment "1" *-- "0..*" Variable : contains
+Shell "1" o-- "0..*" Alias : manages
+
+' Reading & Parsing Cycle
+Terminal "1" -- "1..*" Input : receives
+Shell "1" -- "1..*" Input : interprets
+Input "1" *-- "1..*" Token : parsed into
+Command "1" o-- "1..*" Token : composed of
+Command "1" *-- "0..*" Redirection : contains
+
+' Processes Management
+Shell "1" *-- "0..*" Job : manages
+Job "1" *-- "1..*" Process : spawns
+Job "1" *-- "1" Pipeline : executes
+Process "1" -- "1" Program : executes
+Process "1" -- "0..*" Signal : receives / handles
+Process "1" -- "1" Environment : uses / inherits
+Pipeline "1" *-- "1..*" Command : chains
+
+' System Interface
+Kernel "1" o-- "1..*" Syscall : exposes
+Process "1" -> "1..*" Syscall : invokes
+Kernel "1" o-- "0..*" Process : manages
+@enduml
