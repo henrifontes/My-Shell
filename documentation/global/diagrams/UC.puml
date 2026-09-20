@@ -1,9 +1,7 @@
 @startuml
 
-' left to right direction
-skinparam linetype polyline
-skinparam nodesep 50
-skinparam ranksep 5
+skinparam nodesep 35
+skinparam ranksep 35
 
 skinparam backgroundColor #1E1E2E
 skinparam defaultFontColor #FFFFFF
@@ -13,7 +11,6 @@ skinparam actorFontColor #FFFFFF
 skinparam actorBorderColor #AFA9EC
 
 skinparam usecaseArrowColor #FFFFFF
-
 skinparam usecaseBorderColor #AFA9EC
 skinparam usecaseBackgroundColor #534AB7
 
@@ -26,110 +23,75 @@ skinparam actorStyle awesome
 
 title US003 - Use Case Diagram
 
-' ---------- Actors ----------
+' ===== Actors =====
 actor "System User"        as SU
-actor "Kernel"             as OS
-actor "External Programs"  as EP
-actor "File System"        as FS
+actor "External Program"   as EP << Secondary >>
 
-' ---------- System boundary ----------
-package "Session Management" {
-    usecase "Start Shell"               as UC_Start
-    usecase "Load Configuration File"   as UC_Config
-    usecase "Customize Prompt"          as UC_Prompt
-    usecase "Exit Shell"                as UC_Exit
+' ===== System Boundary =====
+rectangle "Shell System" {
+    package "Session & Configuration" {
+        usecase "Start Shell & REPL (US005)"           as REPL
+        usecase "Load Configuration File (US020)"      as Config
+        usecase "Manage Environment Variables (US012)" as Env
+        usecase "Customize Prompt (US020)"             as Prompt
+        usecase "Exit Shell (US005)"                   as Exit
+    }
+
+    package "Parsing & Processing" {
+        usecase "Tokenize Raw Input (US006)"           as Token
+        usecase "Parse Syntax (US007)"                 as Parse
+        usecase "Handle Quoting & Escape (US008)"      as Quote
+        usecase "Perform Shell Expansions (US009)"     as Expand
+    }
+
+    package "Command Execution" {
+        usecase "Execute Command Line (US005)"          as Exec
+        usecase "Run Built-in Command (US011)"          as Builtin
+        usecase "Run External Program (US010)"          as External
+        usecase "Compose Pipelines (US014)"             as Pipe
+        usecase "Sequence & Logical Execution (US015)"  as Seq
+    }
+
+    package "I/O Redirection" {
+        usecase "Redirect Streams (US013)"             as Redir
+    }
+
+    package "Job Control & Signals" {
+        usecase "Manage Background Jobs (US016)"       as Jobs
+        usecase "Handle System Signals (US017)"        as Signals
+    }
+
+    package "Interactive Line Interface" {
+        usecase "Manage Command History (US018)"       as Hist
+        usecase "Edit Line & Tab Complete (US019)"     as Edit
+    }
 }
 
-package "Tokenization & Prompt Management" {
-    usecase "Parse Input"               as UC_Parse
-    usecase "Tokenize Input"            as UC_Token
-    usecase "Expand Tokens"             as UC_Expand
-    usecase "Pipe Commands"             as UC_Pipe
-    usecase "Sequence Commands"         as UC_Seq
-}
+' ===== Primary Actor Associations =====
+SU -- REPL
+SU -- Config
+SU -- Env
+SU -- Prompt
+SU -- Exit
+SU -- Exec
+SU -- Jobs
+SU -- Signals
+SU -- Hist
+SU -- Edit
 
-package "Command Execution" {
-    usecase "Execute Command"           as UC_Exec
-    usecase "Run Built-in Command"      as UC_Builtin
-    usecase "Run External Program"      as UC_External
-    usecase "Run in Background"         as UC_Bg
-}
+' ===== Execution Dependencies & Flows =====
+REPL .> Token : <<include>>
+Token .> Parse : <<include>>
+Parse .> Quote : <<include>>
+Parse .> Expand : <<extend>>
 
-package "I/O Redirection" {
-    usecase "Redirect Input"            as UC_RIn
-    usecase "Redirect Output"           as UC_ROut
-    usecase "Redirect Error"            as UC_RErr
-}
+Exec <|-- Builtin
+Exec <|-- External
+Exec <|-- Pipe
+Exec <|-- Seq
 
-package "Job Control" {
-    usecase "List Jobs"                 as UC_Jobs
-    usecase "Bring Job to Foreground"   as UC_Fg
-    usecase "Send Signal to Job"        as UC_Sig
-}
+Exec <.. Redir : <<extend>>
 
-package "History & Editing" {
-    usecase "Recall History"            as UC_Hist
-    usecase "Tab-Complete"              as UC_Tab
-    usecase "Edit Line"                 as UC_Edit
-}
-
-package "Environment" {
-    usecase "Manage Environment Vars"   as UC_Env
-    usecase "Manage Aliases"            as UC_Alias
-}
-
-' ---------- System User associations ----------
-SU --> UC_Start
-SU --> UC_Exit
-SU --> UC_Prompt
-SU --> UC_Exec
-SU --> UC_Jobs
-SU --> UC_Fg
-SU --> UC_Sig
-SU --> UC_Hist
-SU --> UC_Tab
-SU --> UC_Edit
-SU --> UC_Env
-SU --> UC_Alias
-
-' ---------- Generalization connections (Child --|> Parent) ----------
-UC_Builtin  --|> UC_Exec
-UC_External --|> UC_Exec
-
-' ---------- Include connections (A ..> B : means A includes B) ----------
-UC_Exec  ..> UC_Parse   : <<include>>
-UC_Exec  ..> UC_Expand  : <<include>>
-UC_Start ..> UC_Config  : <<include>>
-UC_Parse ..> UC_Token   : <<include>>
-
-' ---------- Extend connections (extension ..> base) ----------
-UC_Pipe ..> UC_Exec : <<extend>>
-UC_Seq  ..> UC_Exec : <<extend>>
-UC_Bg   ..> UC_Exec : <<extend>>
-UC_RIn  ..> UC_Exec : <<extend>>
-UC_ROut ..> UC_Exec : <<extend>>
-UC_RErr ..> UC_Exec : <<extend>>
-
-' ---------- Secondary actor associations ----------
-UC_External -> EP
-UC_External -> OS
-UC_Builtin  -> OS
-UC_Sig      -> OS
-UC_Fg       -> OS
-
-UC_Config -> FS
-UC_Hist   -> FS
-UC_RIn    -> FS
-UC_ROut   -> FS
-UC_RErr   -> FS
-
-' ---------- Layout constraints ----------
-' Force better layout using hidden links
-"Session Management" -[hidden]down- "Tokenization & Prompt Management"
-"Tokenization & Prompt Management" -[hidden]down- "Command Execution"
-"Command Execution" -[hidden]down- "I/O Redirection"
-"I/O Redirection" -[hidden]down- "Job Control"
-"Job Control" -[hidden]down- "History & Editing"
-"History & Editing" -[hidden]down- "Environment"
-
+' ===== Secondary Actor Associations =====
+External -- EP
 @enduml
