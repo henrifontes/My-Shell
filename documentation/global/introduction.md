@@ -42,4 +42,4 @@ This project will be really important for me to develop more of the abilities th
 
 > I believe my Master's degree will be in Software Engineering or Systems Engineering. I am still not sure about which one, but I am confident that I will be able to find a good fit for my career and personal taste.
 
-To know more about me, you can check my LinkedIn profile: https://www.linkedin.com/in/henri-fagundes/
+To know more about me, you can check my LinkedIn profile: https://www.linkedin.com/in/henri-fontes/
